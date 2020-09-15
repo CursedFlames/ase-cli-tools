@@ -1,5 +1,5 @@
 [package]
-name = "ase-stuff"
+name = "ase-cli-tools"
 version = "0.1.0"
 authors = ["CursedFlames <18627001+CursedFlames@users.noreply.github.com>"]
 edition = "2018"

@@ -6,7 +6,7 @@ use std::path::Path;
 use ase;
 use ase::{Aseprite, Cel, CelChunk, ChunkData, ColorDepth, Pixels, RGBA256};
 use ase::Cel::{CompressedImage, RawCel};
-use log::{error, info, warn};
+use log::{debug, error, info, warn};
 use simple_logger::SimpleLogger;
 use walkdir::WalkDir;
 
@@ -54,7 +54,11 @@ fn palette_swap_ase(ase: &mut Aseprite, palette: &PaletteMap) {
 					// warn!("Found deprecated palette chunk, skipping");
 				},
 				PaletteChunk(data) => {
-					// TODO handle palette data updating
+					for entry in data.palette_entries.iter_mut() {
+						if let Some(new) = palette.get(&entry.color) {
+							entry.color = new.clone();
+						}
+					}
 				},
 				CelChunk(data) => {
 					transform_pixels(data, |p| {
@@ -113,6 +117,7 @@ fn ase_to_palettemap(ase: &Aseprite) -> PaletteMap {
 			}
 		}
 	}
+	debug!("Palette map:\n{:?}", palette);
 	palette
 }
 
