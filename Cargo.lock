@@ -21,6 +21,8 @@ name = "ase-stuff"
 version = "0.1.0"
 dependencies = [
  "ase",
+ "flate2",
+ "log",
  "simple_logger",
 ]
 
