@@ -85,35 +85,28 @@ fn ase_to_palettemap(ase: &Aseprite) -> PaletteMap {
 	for frame in ase.frames.iter() {
 		for chunk in frame.chunks.iter() {
 			let data = &chunk.chunk_data;
-			use ChunkData::*;
-			match data {
-				CelChunk(data) => {
-					let cel = &data.cel;
-					match cel {
-						RawCel {..} | CompressedImage {..} => {
-							let width = cel.w().unwrap() as usize;
-							let height = cel.h().unwrap() as usize;
-							if width < 1 || height < 2 {
-								break;
-							}
-							if let Some(pixels) = cel.pixels(&ColorDepth::RGBA) {
-								use ase::Pixels::RGBA;
-								match pixels {
-									RGBA(pixels) => {
-										for x in 0usize..width {
-											let from = pixels[x];
-											let to = pixels[x+width];
-											palette.insert(from, to);
-										}
-									},
-									_ => {}
-								}
-							}
-						},
-						_ => {}
+			if let ChunkData::CelChunk(data) = data {
+				let cel = &data.cel;
+				if let RawCel {..} | CompressedImage {..} = cel {
+					let width = cel.w().unwrap() as usize;
+					let height = cel.h().unwrap() as usize;
+					if width < 1 || height < 2 {
+						continue;
 					}
-				},
-				_ => {}
+					if let Some(pixels) = cel.pixels(&ColorDepth::RGBA) {
+						use ase::Pixels::RGBA;
+						match pixels {
+							RGBA(pixels) => {
+								for x in 0usize..width {
+									let from = pixels[x];
+									let to = pixels[x+width];
+									palette.insert(from, to);
+								}
+							},
+							_ => {}
+						}
+					}
+				}
 			}
 		}
 	}
