@@ -154,17 +154,22 @@ fn main() {
 	};
 
 	if input_path.is_dir() {
+		// Note that the iter is collect()ed before the loop,
+		// so that output files aren't read as inputs if output_path is inside input_path
 		for entry in WalkDir::new(input_path).into_iter()
-				.filter_map(|e| e.ok()).filter(|e| is_ase_extension(e.path().extension())) {
+				.filter_map(|e| e.ok()).filter(|e| is_ase_extension(e.path().extension()))
+				.collect::<Vec<_>>() {
 			let path = entry.path();
 			// TODO shouldn't use this expect here
 			let output_path = output_path.join(path.strip_prefix(input_path).expect("Failed to strip path prefix"));
 
 			let output_folder = output_path.parent();
 			if let Some(output_folder) = output_folder {
-				info!("Making output folder {}", output_folder.display());
-				if let Err(e) = fs::create_dir_all(output_folder) {
-					warn!("Error making output directory {}:\n{}", output_folder.display(), e);
+				if !output_folder.exists() {
+					info!("Making output folder {}", output_folder.display());
+					if let Err(e) = fs::create_dir_all(output_folder) {
+						warn!("Error making output directory {}:\n{}", output_folder.display(), e);
+					}
 				}
 			}
 
