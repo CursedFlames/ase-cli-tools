@@ -1,4 +1,4 @@
-use std::{env, fs, io};
+use std::{fs, io};
 use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::path::Path;
@@ -110,6 +110,7 @@ fn ase_to_palettemap(ase: &Aseprite) -> PaletteMap {
 			}
 		}
 	}
+	// TODO maybe figure out how to format this more nicely?
 	debug!("Palette map:\n{:?}", palette);
 	palette
 }
@@ -132,14 +133,36 @@ fn palette_swap_path(palette: &PaletteMap, input: &Path, output: &Path) -> Resul
 fn main() {
 	SimpleLogger::new().init().unwrap_or_else(|e| eprintln!("Failed to create logger: {}", e));
 
-	// TODO will probably want to switch to an actual argument parsing library soon
-	let mut args = env::args().skip(1);
-	let palette_path = args.next().expect("Missing first argument (palette file)");
-	let palette_path = Path::new(&palette_path);
-	let input_path = args.next().expect("Missing second argument (input file or directory)");
-	let input_path = Path::new(&input_path);
-	let output_path = args.next().expect("Missing third argument (output file or directory)");
-	let output_path = Path::new(&output_path);
+	let arg_matches = clap::App::new("Ase CLI Utils")
+		.version("0.1.1")
+		.author("CursedFlames")
+		.subcommand(clap::SubCommand::with_name("paletteswap")
+			.arg(clap::Arg::with_name("palette")
+				.help("Path of the palette file. The palette file should be a 2 pixel high aseprite file, with the top row as source colors and the bottom row as destination colors.")
+				.required(true)
+				.index(1))
+			.arg(clap::Arg::with_name("input")
+				.help("Path of the input file or directory")
+				.required(true)
+				.index(2))
+			.arg(clap::Arg::with_name("output")
+				.help("Path to create the output file or directory")
+				.required(true)
+				.index(3)))
+		.get_matches();
+
+	match arg_matches.subcommand() {
+		("paletteswap", Some(args)) => {
+			let palette_path = Path::new(args.value_of("palette").unwrap());
+			let input_path = Path::new(args.value_of("input").unwrap());
+			let output_path = Path::new(args.value_of("output").unwrap());
+			cmd_palette_swap(palette_path, input_path, output_path);
+		}
+		_ => {}
+	}
+}
+
+fn cmd_palette_swap(palette_path: &Path, input_path: &Path, output_path: &Path) {
 	if output_path.exists() {
 		error!("Output file/directory already exists, please remove it first.");
 		return;

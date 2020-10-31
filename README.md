@@ -6,9 +6,17 @@ A CLI tool written in Rust for batch modification of Aseprite files.
 Make sure to use `--recursive` when cloning so that the submodule is initialized.
 e.g. `git clone --recursive https://github.com/CursedFlames/ase-cli-tools`
 
+Base command:
+
+```cargo run --release -- <command>```
+
+For help:
+
+```cargo run --release -- help```
+
 Currently only supports palette swapping. Usage:
 
-```cargo run --release <palette file> <input file/dir> <output name>```
+```cargo run --release -- paletteswap <palette file> <input file/dir> <output name>```
 
 where `palette file` is a 2 pixel high Aseprite file with the top row containing source colors,
 and the bottom row containing destination colors. All cels will be used, regardless of layer or frame.

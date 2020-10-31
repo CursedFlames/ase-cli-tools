@@ -1,6 +1,6 @@
 [package]
 name = "ase-cli-tools"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["CursedFlames <18627001+CursedFlames@users.noreply.github.com>"]
 edition = "2018"
 
@@ -12,3 +12,4 @@ simple_logger = "1.9.0"
 flate2 = "1.0.17"
 log = "0.4.11"
 walkdir = "2.3.1"
+clap = "2.33.3"
